@@ -9,16 +9,16 @@ def captureVideo():
     capture = cv2.VideoCapture(0)
     # Read until the video is completed
     # Once we switch to Rtsp it will go forever (Technically)
-    while True:
+    while capture.isOpened():
         # Capture Frame by Frame:
-        ret, image = capture.read()
-        if not ret:
+        success, image = capture.read()
+        if not success:
             break
         else:
-            ret, buffer = cv2.imencode('.jpg', image)
+            buffer = cv2.imencode('.jpg', image)[1]
             frame = buffer.tobytes()
             yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
 
 @app.route('/video_feed/<string:id>/', methods=["GET"])
